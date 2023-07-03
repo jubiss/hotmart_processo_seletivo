@@ -21,7 +21,7 @@ class build_features(BaseEstimator, TransformerMixin):
 
         self.features_prod_categ = self.product_category_eng(df, 'product_category')
         self.features_prod_niche = self.product_category_eng(df, 'product_niche')
-        self.feature_repurchase, self.columns_repurchase = self.repurchase_eng(df)
+        #self.feature_repurchase, self.columns_repurchase = self.repurchase_eng(df)
         #self.feature_creation_date = self.product_creation_date_eng(df)
         self.feature_producer, self.columns_producer = self.producer_feature_eng(df)
         return self
@@ -32,11 +32,6 @@ class build_features(BaseEstimator, TransformerMixin):
         X = X.merge(self.features_prod_categ, on=['product_category'], how='left').fillna(0)
         # Product Niche
         X = X.merge(self.features_prod_niche, on=['product_niche'], how='left')
-        # Product Repurchase
-        X = X.merge(self.feature_repurchase, on=['product_id'], how='left')
-        X[self.columns_repurchase] = X[self.columns_repurchase].fillna(False)
-        # Product creation date
-        #X = X.merge(self.feature_creation_date, on=['product_id'], how='left')
         # Producer
         X = X.merge(self.feature_producer, on=['producer_id'], how='left')
         X[self.columns_producer] = X[self.columns_producer].fillna(0)
@@ -82,16 +77,7 @@ class build_features(BaseEstimator, TransformerMixin):
         columns = producer_feat.drop(columns=['producer_id']).columns
         return producer_feat, columns
 
-    def repurchase_eng(self, df):
-        
-        repurchase = df.groupby(['product_id', 'buyer_id']).agg(count_purchases = ('buyer_id', 'count')).reset_index()
-        repurchase = repurchase.groupby(['product_id',]).agg(count_purchases = ('count_purchases', 'sum'),
-                                                    count_buyers = ('buyer_id','nunique'))
-        repurchase = repurchase[repurchase['count_buyers']*1.1 < repurchase['count_purchases']].reset_index()
-        repurchase['repurchase'] = True
-        return repurchase[['product_id', 'repurchase']], ['repurchase']
-
-    def product_category_eng(self, df, column):
+    def product_category_eng(self, df, column, filter_with_few_products = False):
         #product_category, product_niche
         features = df.groupby(['product_id', column]).agg(
             total_sell = ('purchase_value', 'sum'),
@@ -125,6 +111,9 @@ class build_features(BaseEstimator, TransformerMixin):
             'mean_buyers': f'{column}_mean_buyers',
             'std_buyers': f'{column}_std_buyers'
         }
+        if ('affiliate_id'==column) | ('producer_id'==column):
+            if filter_with_few_products:
+                features = features[(features[f'{column}_total_prod'] > 5)]
 
         features = features.rename(columns=new_columns)
         return features
@@ -145,7 +134,13 @@ class build_features(BaseEstimator, TransformerMixin):
 
         df = df.merge(affiliate_n_prod, how = 'left', on=['affiliate_id'])
         return df.drop(columns=['affiliate_id'])
-    
+
+def static_features(df, predict=False):
+    df = product_creation_date_eng(df)
+    if predict==False:
+        df = repurchase_eng(df)
+    return df
+
 def product_creation_date_eng(df):
     from datetime import datetime
     last_purchase = datetime(2016, 6, 30)
@@ -155,22 +150,12 @@ def product_creation_date_eng(df):
     #creation_dates = df[['product_id', 'years_since_creation', 'months_since_creation']].drop_duplicates()
     return df
 
-
-class TargetEncoder(BaseEstimator, TransformerMixin):
-    def __init__(self, cols):
-        self.cols = cols
-        self.target_encoders = {}
-
-    def fit(self, X, y):
-        breakpoint()
-        df = pd.concat([X, y], axis=1)
-        for col in self.cols:
-            target_encoder = df.groupby(col)['target'].mean().to_dict()
-            self.target_encoders[col] = target_encoder
-        return self
-
-    def transform(self, X):
-        X_encoded = X.copy()
-        for col in self.cols:
-            X_encoded[col] = X_encoded[col].map(self.target_encoders[col])
-        return X_encoded
+def repurchase_eng(df):
+    repurchase = df.groupby(['product_id', 'buyer_id']).agg(count_purchases = ('buyer_id', 'count')).reset_index()
+    repurchase = repurchase.groupby(['product_id',]).agg(count_purchases = ('count_purchases', 'sum'),
+                                                         count_buyers = ('buyer_id','nunique'))
+    repurchase = repurchase[repurchase['count_buyers']*1.1 < repurchase['count_purchases']]
+    repurchase['repurchase'] = True
+    df = df.merge(repurchase['repurchase'], how='left', left_index=True, right_index=True)
+    df['repurchase'] = df['repurchase'].fillna(False)
+    return df
