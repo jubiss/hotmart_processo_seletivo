@@ -50,6 +50,7 @@ class build_features(BaseEstimator, TransformerMixin):
         X = X.set_index('product_id')
         self.columns = X.columns
         return X
+
     
     def get_feature_names_out(self):
         # Return the column names of the transformed DataFrame

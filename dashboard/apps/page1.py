@@ -143,7 +143,12 @@ layout = html.Div(
 
             *Esse é um modelo inicial, e existem muitos avanços a serem feitos tanto na construção de novas features quanto na melhoria do Pipeline.*
         """),
+
+
+  
     
         ]
         )]
         )
+
+  #['producer_id', 'repurchase', 'product_category', 'product_niche', 'product_creation_date']
