@@ -26,7 +26,7 @@ def navbar_():
                             dbc.Nav(
                                 [
                                     dbc.NavItem(dbc.NavLink("Visão Geral", href="/")), # Navigation Link page 1
-                                    dbc.NavItem(dbc.NavLink("Profiling_report", href="Profiling_report"))
+                                    dbc.NavItem(dbc.NavLink("Profiling_report", href="/Profiling_report"))
                                 ],
                                 navbar=True,
                                 className="justify-content-end",
@@ -92,7 +92,7 @@ def display_page(pathname):
     elif pathname == '/Estoque':
         return # page2.layout
     elif pathname == '/Profiling_report':
-        return #pandas_profiling_layout()
+        return pandas_profiling_layout()
     else:
         return #'404 Page not found'
 

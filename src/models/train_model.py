@@ -61,4 +61,4 @@ X_test_pipe.to_csv(r'data\processed\pred_test_data.csv')"""
 #results_df.to_csv('model_parameters.csv', index=True)
 
 # Save Model
-dump(pipeline, 'models\XGBosst.joblib')
+dump(pipeline, 'models\XGBoost.joblib')

@@ -141,8 +141,38 @@ layout = html.Div(
             Para fazer isso, a forma escolhida vai ser entender quais são os principais Drivers para aumento da venda de produtos.
             Para obter isso foram geradas Features que vão permitir entender melhor como indicar para um Produtor entender como trazer mais atenção a seu produto.
 
+            A partir dessa seção vamos focar em análises para desenvolvimento de Features e resultados obtidos. Todas essas análises estão assumindo normalização via MinMaxScaler.
+
             *Esse é um modelo inicial, e existem muitos avanços a serem feitos tanto na construção de novas features quanto na melhoria do Pipeline.*
+
+            ### Exploração dos dados
+
+            Primeiro foi observado a varibilidade dos preços dos produtos, abaixo é possível observar a grande diferença entre os Outliers e os valores abaixo do último quartil.
         """),
+        dbc.Row(
+        dbc.Col(
+            [
+                dcc.Graph(
+                    id='box-faturamento',
+                    figure={},
+                    style={'width': '100%'}
+                ),
+            ],
+            width= 12 #{'offset': 2},  # Adjust the width and offset as needed
+        ),
+        justify='center',
+    ),
+        dcc.Markdown(
+        """
+            Inicialmente foi observado a correlação entre possíveis Fetures e o total vendido por um produto.
+            Esssas Features foram, product_category, product_niche, product_creation_data, e se o produto pode ser obtido múltiplas vezes ou não.
+        """),
+    c1.input_top_label(id='column-analise', label= 'Coluna', value=20),
+    dcc.Markdown("""
+    ### Uso do modelo
+
+    Abaixo temos um Proxy de uso do modelo para precificar o preço de um possível produto.
+    """),
     dbc.Row(
         [dbc.Col(c1.input_top_label(id='producer-id', label='Producer Id', value = 30), width=2),
          dbc.Col(c1.input_top_label(id='repurchase', label='Repurchase', value = 'True', type="text"), width=2),
@@ -150,6 +180,7 @@ layout = html.Div(
          dbc.Col(c1.input_top_label(id='product-niche', label='Product Niche', value = "Child psychology", type="text"), width=2),
          dbc.Col(c1.input_top_label(id='product-creation-data', label='Product Creation Data', value = '2011-03-19', type="text"), width=2)]
         ),
+        html.Div(id='previsao-modelo')
         ]
         )]
         )

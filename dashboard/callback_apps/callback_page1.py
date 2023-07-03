@@ -5,11 +5,21 @@ sys.path.append(os.getcwd())
 import plotly.graph_objects as go
 from dash.dependencies import Input, Output
 from app import app
-from dash import html
+from dash import html, dcc
 from sklearn.preprocessing import MinMaxScaler
 from src.models.predict_model import single_prediction
+import plotly.express as px
+def transform_z_values(values, mean, std):
+    return values*std + mean
+
 
 df = pd.read_csv(r'data\sales_data.csv', index_col = 0)
+scaler = MinMaxScaler(feature_range=(10**-4, 1))
+df['purchase_value_min_max'] = scaler.fit_transform(df[['purchase_value']])
+y = df.groupby('product_id').agg(value_product = ('purchase_value_min_max', 'sum'))
+y['target_q'] = pd.qcut(y['value_product'], q=4, labels=['Quartil 1', 'Quartil 2', 'Quartil 3', 'Quartil 4'])
+df = df.merge(y.reset_index()[['product_id', 'target_q']], on=['product_id'], how='left')
+
 
 def create_indicator(value, title):
     color = '#e6e1df'
@@ -29,10 +39,6 @@ def create_indicator(value, title):
         paper_bgcolor="rgba(0,0,0,0)"  # Set the paper (plot area) background color to transparent
         )
     return indicator
-
-def transform_z_values(values, mean, std):
-    return values*std + mean
-
 
 def plot_cumulative_revenue(df, purchase, threshold):
     # Your data processing code
@@ -138,12 +144,10 @@ def get_transformed_z_indicators(scale='Z-score',mean=30, std=50, high_sellers_t
             mean = 30
         if std is None:
             std = 50
-        value = 'purchase_value_x'
         df['purchase_value_x'] = df['purchase_value'].apply(transform_z_values, mean=mean, std=std)
+        value = 'purchase_value_x'
     elif scale == 'MinMaxScaler':
         value = 'purchase_value_min_max'
-        scaler = MinMaxScaler(feature_range=(10**-3, 1))
-        df[value] = scaler.fit_transform(df[['purchase_value']])
 
     line_cumulative = plot_cumulative_revenue(df, value, high_sellers_threshold)
     #if value == 'purchase_value':
@@ -169,7 +173,6 @@ def get_transformed_z_indicators(scale='Z-score',mean=30, std=50, high_sellers_t
     indicators.append(bar_cumulative)
     return indicators
 
-
 @app.callback(
     Output('indicador-produto-barato', 'figure'),
     Output('indicador-produto-caro', 'figure'),
@@ -190,6 +193,49 @@ def update_z_indicators(scale, mean, std, high_sellers_threshold):
             indicators[3] if len(indicators) > 3 else {}, \
             indicators[4] if len(indicators) > 4 else {}
 
+def plot_box_faturamento():
+    # Create the box plot
+    fig = px.box(y.round(3), x='value_product', color='target_q', labels={'target_q': 'Quartil Faturamento'})
+    # Set the x-axis type to 'log'
+    fig.update_xaxes(type='log',
+                     showgrid=False)
+    fig.update_layout(
+        xaxis_title='Faturamento de Produtos',
+        plot_bgcolor='rgba(0,0,0,0)',  # Remove background color
+        font=dict(size=18),  # Increase font size
+    )
+    fig.update_yaxes(showgrid=False,)
+    # Show the figure
+    return fig
+
+def plot_quntile_proportion():
+    # Create the box plot
+    fig = px.bar(df, x='product_category', y='target_q' labels={'target_q': 'Quartil Faturamento'})
+    # Set the x-axis type to 'log'
+    fig.update_xaxes(showgrid=False)
+    fig.update_layout(
+        xaxis_title='Faturamento de Produtos',
+        plot_bgcolor='rgba(0,0,0,0)',  # Remove background color
+        font=dict(size=18),  # Increase font size
+    )
+    fig.update_yaxes(showgrid=False,)
+    # Show the figure
+    return fig
+
+
+def feature_exploration():
+    inputs = []
+    inputs.append(plot_box_faturamento())
+    return inputs
+@app.callback(    
+    Output('box-faturamento', 'figure'),
+    [Input('column-analise', 'value')]
+    )
+def update_feature_exploration(column=None):
+    inputs = feature_exploration()
+    return  inputs[0] if len(inputs) > 0 else {}
+    
+
 
 @app.callback(
     Output('previsao-modelo', 'children'),
@@ -198,8 +244,8 @@ def update_z_indicators(scale, mean, std, high_sellers_threshold):
     Input('product-category', 'value'), 
     Input('product-niche', 'value'),
     Input('product-creation-data', 'value')])
-def prediction(producer_id, repurchase, product_category, product_niche, product_creation_data):
-    prediction = single_prediction(producer_id, bool(repurchase), product_category, product_niche, product_creation_data)
-    return html.div([html.P(f'Valor esperado do produto: {prediction}')])
-
-
+def prediction(producer_id, repurchase, product_category, product_niche, product_creation_date):
+    prediction = single_prediction(product_id=-1, producer_id=producer_id, repurchase=bool(repurchase), 
+                                    product_category=product_category, product_niche=product_niche, 
+                                    product_creation_date=product_creation_date)
+    return f"Valor esperado do produto: MinMaxScale {prediction}"

@@ -16,9 +16,8 @@ def single_prediction(product_id , producer_id, repurchase, product_category, pr
     data = data.set_index('product_id')
     data = build_features.static_features(data, predict=True)
     predictions = model.predict(data)
-    return predictions
+    return predictions[0].round(3)
 
-pred = single_prediction(product_id=-1 , producer_id=534, repurchase=True, 
+"""pred = single_prediction(product_id=-1 , producer_id=534, repurchase=True, 
                          product_category='Podcast', product_niche='Child psychology', 
-                         product_creation_date='2011-03-19')
-print(pred)
+                         product_creation_date='2011-03-19')"""
