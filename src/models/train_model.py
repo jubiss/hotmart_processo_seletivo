@@ -5,7 +5,7 @@ import pandas as pd
 import src.features.build_features as build_features
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import MinMaxScaler
-from xgboost.sklearn import XGBRegressor
+from xgboost.sklearn import XGBClassifier
 from sklearn.model_selection import train_test_split
 from joblib import dump
 #from boruta import BorutaPy
@@ -24,16 +24,18 @@ param_grid = {
 
 df = df.set_index('product_id')
 df = build_features.static_features(df)
-X_train, X_test, y_train, y_test = train_test_split(df.drop(columns=['purchase_value']), df[['purchase_value']])
+
+X_train, X_test, y_train, y_test = train_test_split(df, df['purchase_value'])
 
 y_train = y_train.reset_index().groupby('product_id').agg(target = ('purchase_value', 'sum'))['target']
+y_train = pd.qcut(y_train, q=4, labels=[0, 1, 2, 3])
 y_test = y_test.reset_index().groupby('product_id').agg(target = ('purchase_value', 'sum'))['target']
-
+y_test = pd.qcut(y_test, q=4, labels=[0, 1, 2, 3])
 
 pipeline = Pipeline([
     ('feature_engineering', build_features.build_features(filter_with_few_products=True)),
     #('feature_selection', BorutaPy(XGBRegressor(), n_estimators='auto', verbose=1, random_state=1)),
-    ('model', XGBRegressor())
+    ('model', XGBClassifier())
 ])
 
 pipeline.fit(X_train, y_train)

@@ -17,7 +17,7 @@ class build_features(BaseEstimator, TransformerMixin):
 
     def fit(self, X, y=None):
         df = X.reset_index()
-        df['purchase_value'] = y
+        #df['purchase_value'] = y
 
         self.features_prod_categ = self.product_category_eng(df, 'product_category')
         self.features_prod_niche = self.product_category_eng(df, 'product_niche')

@@ -13,12 +13,12 @@ def transform_z_values(values, mean, std):
     return values*std + mean
 
 
-df = pd.read_csv(r'data\sales_data.csv', index_col = 0)
-scaler = MinMaxScaler(feature_range=(10**-4, 1))
+df = pd.read_csv(r'data\processed\dash_data.csv', index_col = 0)
+"""scaler = MinMaxScaler(feature_range=(10**-4, 1))
 df['purchase_value_min_max'] = scaler.fit_transform(df[['purchase_value']])
 y = df.groupby('product_id').agg(value_product = ('purchase_value_min_max', 'sum'))
 y['target_q'] = pd.qcut(y['value_product'], q=4, labels=['Quartil 1', 'Quartil 2', 'Quartil 3', 'Quartil 4'])
-df = df.merge(y.reset_index()[['product_id', 'target_q']], on=['product_id'], how='left')
+df = df.merge(y.reset_index()[['product_id', 'target_q']], on=['product_id'], how='left')"""
 
 
 def create_indicator(value, title):
@@ -195,6 +195,8 @@ def update_z_indicators(scale, mean, std, high_sellers_threshold):
 
 def plot_box_faturamento():
     # Create the box plot
+    y = df.groupby('product_id').agg(value_product = ('purchase_value_min_max', 'sum'))
+    y['target_q'] = pd.qcut(y['value_product'], q=4, labels=['Quartil 1', 'Quartil 2', 'Quartil 3', 'Quartil 4'])
     fig = px.box(y.round(3), x='value_product', color='target_q', labels={'target_q': 'Quartil Faturamento'})
     # Set the x-axis type to 'log'
     fig.update_xaxes(type='log',
@@ -208,9 +210,9 @@ def plot_box_faturamento():
     # Show the figure
     return fig
 
-def plot_quntile_proportion():
+def plot_quantil_proportion():
     # Create the box plot
-    fig = px.bar(df, x='product_category', y='target_q' labels={'target_q': 'Quartil Faturamento'})
+    fig = px.bar(df, x='product_category', y='target_q', labels={'target_q': 'Quartil Faturamento'})
     # Set the x-axis type to 'log'
     fig.update_xaxes(showgrid=False)
     fig.update_layout(
@@ -223,17 +225,20 @@ def plot_quntile_proportion():
     return fig
 
 
-def feature_exploration():
+"""def feature_exploration(column):
     inputs = []
     inputs.append(plot_box_faturamento())
+    inputs.append(plot_quantil_proportion())
     return inputs
 @app.callback(    
     Output('box-faturamento', 'figure'),
+    Output('quantile-proportion', 'figure'),
     [Input('column-analise', 'value')]
     )
 def update_feature_exploration(column=None):
-    inputs = feature_exploration()
-    return  inputs[0] if len(inputs) > 0 else {}
+    inputs = feature_exploration(column)
+    return  inputs[0] if len(inputs) > 0 else {}, \
+            inputs[1] if len(inputs) > 0 else {}"""
     
 
 

@@ -149,19 +149,6 @@ layout = html.Div(
 
             Primeiro foi observado a varibilidade dos preços dos produtos, abaixo é possível observar a grande diferença entre os Outliers e os valores abaixo do último quartil.
         """),
-        dbc.Row(
-        dbc.Col(
-            [
-                dcc.Graph(
-                    id='box-faturamento',
-                    figure={},
-                    style={'width': '100%'}
-                ),
-            ],
-            width= 12 #{'offset': 2},  # Adjust the width and offset as needed
-        ),
-        justify='center',
-    ),
         dcc.Markdown(
         """
             Com isso o foco que foi dado ao projeto, foi gerar um classificador que identifica em qual quartil um projeto com certas características vai cair.
@@ -170,11 +157,10 @@ layout = html.Div(
             Inicialmente foi observado a correlação entre possíveis Fetures e o total vendido por um produto.
             Esssas Features foram, product_category, product_niche, product_creation_data, e se o produto pode ser obtido múltiplas vezes ou não.
         """),
-    c1.input_top_label(id='column-analise', label= 'Coluna', value=20),
     dcc.Markdown("""
     ### Uso do modelo
 
-    Abaixo temos um Proxy de uso do modelo para precificar o preço de um possível produto.
+    Abaixo temos um Proxy de uso do modelo para identificar em qual quantil ficaria o produto.
     """),
     dbc.Row(
         [dbc.Col(c1.input_top_label(id='producer-id', label='Producer Id', value = 30), width=2),
