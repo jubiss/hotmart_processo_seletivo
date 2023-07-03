@@ -164,6 +164,9 @@ layout = html.Div(
     ),
         dcc.Markdown(
         """
+            Com isso o foco que foi dado ao projeto, foi gerar um classificador que identifica em qual quartil um projeto com certas características vai cair.
+            Isso possibilita identificar as principais variáveis responsáveis por alto faturamento desses produtos.
+
             Inicialmente foi observado a correlação entre possíveis Fetures e o total vendido por um produto.
             Esssas Features foram, product_category, product_niche, product_creation_data, e se o produto pode ser obtido múltiplas vezes ou não.
         """),
