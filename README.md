@@ -9,8 +9,11 @@ O modelo de faturamento foi gerado, mas os resultados não foram satisfatórios,
 Guia de Instalação
 ------------
 Windows:
+
     Clicar no arquivo install.bat vai instalar as bibliotecas do requirements em um venv chamado hotmart_venv
+
 Linux:
+
     No diretorio do projeto rodar """./setup_hotmart.sh""" para instalar as bibliotecas em um venv chamado hotmart_venv
 
 
