@@ -26,7 +26,6 @@ def navbar_():
                             dbc.Nav(
                                 [
                                     dbc.NavItem(dbc.NavLink("Visão Geral", href="/")), # Navigation Link page 1
-                                    dbc.NavItem(dbc.NavLink("Estoque", href="/Estoque")), # Navigation Link page 2
                                     dbc.NavItem(dbc.NavLink("Profiling_report", href="Profiling_report"))
                                 ],
                                 navbar=True,
@@ -65,7 +64,7 @@ def pandas_profiling_layout():
                 '''
             ),
             html.Iframe(
-                src='/assets/viva_report.html',
+                src='/assets/sales_data_report.html',
                 style={'width': '100%', 'height': '800px'}
             )
         ]
