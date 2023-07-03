@@ -38,7 +38,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="C:\Users\jubi\Desktop\Projetos\processo seletivo\hotmart_venv"
+VIRTUAL_ENV="C:\Users\jubi\Desktop\Projetos\processo seletivo\hotmart_processo_seletivo\hotmart_venv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"

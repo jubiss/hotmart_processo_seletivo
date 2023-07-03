@@ -41,11 +41,20 @@ class build_features(BaseEstimator, TransformerMixin):
         X = X.merge(self.feature_producer, on=['producer_id'], how='left')
         X[self.columns_producer] = X[self.columns_producer].fillna(0)
         
-        #y= X.groupby('product_id').agg(target = ('purchase_value', 'sum'))
-
-        X = X.drop(columns=['buyer_id', 'producer_id', 'product_category', 'product_niche', 'product_creation_date', 'affiliate_id', 
+        """X = X.drop(columns=['buyer_id', 'producer_id', 'product_category', 'product_niche', 'product_creation_date', 'affiliate_id', 
                             'purchase_id', 'purchase_date','affiliate_commission_percentual', 'purchase_device',
-                            'purchase_origin', 'is_origin_page_social_network', 'Venda'])
+                            'purchase_origin', 'is_origin_page_social_network', 'Venda'])"""
+        
+        X = X[['product_id','years_since_creation','months_since_creation','product_category_total_prod',
+              'product_category_total_sell', 'product_category_mean_sell','product_category_std_sell',
+              'product_category_total_volume','product_category_mean_volume','product_category_std_volume',
+              'product_category_total_buyers','product_category_mean_buyers','product_category_std_buyers',
+              'product_niche_total_prod','product_niche_total_sell','product_niche_mean_sell',
+              'product_niche_std_sell','product_niche_total_volume','product_niche_mean_volume',
+              'product_niche_std_volume','product_niche_total_buyers','product_niche_mean_buyers',
+              'product_niche_std_buyers','repurchase','n_prod_producer','count_vendas_producer',
+              'total_vendas_producer','media_vendas_produtos_producer']]
+
         X = X.drop_duplicates()
         X = X.set_index('product_id')
         self.columns = X.columns

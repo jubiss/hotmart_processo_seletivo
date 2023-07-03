@@ -5,7 +5,9 @@ sys.path.append(os.getcwd())
 import plotly.graph_objects as go
 from dash.dependencies import Input, Output
 from app import app
+from dash import html
 from sklearn.preprocessing import MinMaxScaler
+from src.models.predict_model import single_prediction
 
 df = pd.read_csv(r'data\sales_data.csv', index_col = 0)
 
@@ -187,3 +189,17 @@ def update_z_indicators(scale, mean, std, high_sellers_threshold):
             indicators[2] if len(indicators) > 2 else {}, \
             indicators[3] if len(indicators) > 3 else {}, \
             indicators[4] if len(indicators) > 4 else {}
+
+
+@app.callback(
+    Output('previsao-modelo', 'children'),
+    [Input('producer-id', 'value'),
+    Input('repurchase', 'value'),
+    Input('product-category', 'value'), 
+    Input('product-niche', 'value'),
+    Input('product-creation-data', 'value')])
+def prediction(producer_id, repurchase, product_category, product_niche, product_creation_data):
+    prediction = single_prediction(producer_id, bool(repurchase), product_category, product_niche, product_creation_data)
+    return html.div([html.P(f'Valor esperado do produto: {prediction}')])
+
+

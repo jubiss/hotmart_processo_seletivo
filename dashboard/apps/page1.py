@@ -143,10 +143,13 @@ layout = html.Div(
 
             *Esse é um modelo inicial, e existem muitos avanços a serem feitos tanto na construção de novas features quanto na melhoria do Pipeline.*
         """),
-
-
-  
-    
+    dbc.Row(
+        [dbc.Col(c1.input_top_label(id='producer-id', label='Producer Id', value = 30), width=2),
+         dbc.Col(c1.input_top_label(id='repurchase', label='Repurchase', value = 'True', type="text"), width=2),
+         dbc.Col(c1.input_top_label(id='product-category', label='Product Category', value = "Podcast", type="text"), width=2),
+         dbc.Col(c1.input_top_label(id='product-niche', label='Product Niche', value = "Child psychology", type="text"), width=2),
+         dbc.Col(c1.input_top_label(id='product-creation-data', label='Product Creation Data', value = '2011-03-19', type="text"), width=2)]
+        ),
         ]
         )]
         )

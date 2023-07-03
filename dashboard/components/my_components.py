@@ -1,7 +1,7 @@
 import dash_bootstrap_components as dbc
 from dash import html, dash_table, dcc
 text_font_size = '18px'
-def input_top_label(id, label, value):
+def input_top_label(id, label, value, type="number"):
     """
     Create a container with a labeled input field on top.
 
@@ -21,7 +21,7 @@ def input_top_label(id, label, value):
             dbc.Row(dbc.Input(
                     id=id,
                     value=value,
-                    type="number",
+                    type=type,
                     #min=0,
                     #max=300,
                     # className="form-control",

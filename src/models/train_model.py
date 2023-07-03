@@ -22,21 +22,15 @@ param_grid = {
     'model__subsample': [0.8, 0.9, 1.0]
 }
 
-#y = df.groupby('product_id').agg(target = ('purchase_value', 'sum'))['target']
-#X = df
 
-#X = features.fit_transform(X=df)
-#X, y = X.sort_index(), y.sort_index()
 
 df = df.set_index('product_id')
 df = build_features.product_creation_date_eng(df)
 X_train, X_test, y_train, y_test = train_test_split(df.drop(columns=['purchase_value']), df[['purchase_value']])
-#features = build_features.build_features()
+
 y_train = y_train.reset_index().groupby('product_id').agg(target = ('purchase_value', 'sum'))['target']
 y_test = y_test.reset_index().groupby('product_id').agg(target = ('purchase_value', 'sum'))['target']
-"""features.fit(X_train, y_train)
-X_train = features.transform(X_train)
-X_test = features.transform(X_test)"""
+
 
 pipeline = Pipeline([
     ('feature_engineering', build_features.build_features(filter_with_few_products=True)),
@@ -57,7 +51,6 @@ X_test_pipe['target'] = y_test
 X_train_pipe['pred'] = train_pred
 X_test_pipe['pred'] = test_pred
 
-breakpoint()
 X_train_pipe.to_csv(r'data\processed\pred_train_data.csv') 
 X_test_pipe.to_csv(r'data\processed\pred_test_data.csv')
 
@@ -68,6 +61,5 @@ X_test_pipe.to_csv(r'data\processed\pred_test_data.csv')
 #results_df = pd.DataFrame.from_dict(eval_dict, orient='index', columns=['XGBoost'])
 #results_df.to_csv('model_parameters.csv', index=True)
 
-# Save the best model
-# best_model = grid_search.best_estimator_
-#dump(best_model, 'best_model.joblib')
+# Save Model
+dump(pipeline, 'models\XGBosst.joblib')
